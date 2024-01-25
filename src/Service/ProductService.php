@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Repository\BrandRepository;
 use App\Repository\ColorRepository;
 use App\Repository\MaterialRepository;
+use App\Repository\ProductRepository;
 use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Faker\Factory;
@@ -18,9 +19,15 @@ class ProductService
         private readonly MaterialRepository     $materialRepository,
         private readonly TypeRepository         $typeRepository,
         private readonly ColorRepository        $colorRepository,
-        private readonly BrandRepository        $brandRepository
+        private readonly BrandRepository        $brandRepository,
+        private readonly ProductRepository      $productRepository
     )
     {
+    }
+
+    public function getAllProducts(): array
+    {
+        return $this->productRepository->findAll();
     }
 
     public function create(array $data): Product

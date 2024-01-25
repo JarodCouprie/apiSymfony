@@ -34,10 +34,10 @@ class ProductController extends AbstractController
     )]
     #[OA\Tag(name: 'Produits')]
     #[Security(name: 'Bearer')]
-    public function index(ProductRepository $productRepository): JsonResponse
+    public function index(ProductService $productService): JsonResponse
     {
         try {
-            $products = $productRepository->findAll();
+            $products = $productService->getAllProducts();
             return $this->json([
                 'products' => $products
             ], context: [
