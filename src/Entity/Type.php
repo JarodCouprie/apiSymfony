@@ -14,11 +14,11 @@ class Type
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('product:read')]
+    #[Groups(['product:read','product:update','product:create'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups('product:read')]
+    #[Groups(['product:read', 'type:create', 'type:update'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'type', targetEntity: Product::class)]

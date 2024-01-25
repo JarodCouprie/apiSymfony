@@ -18,15 +18,15 @@ class Product
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups('product:read')]
+    #[Groups(['product:read', 'product:create', 'product:update'])]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups('product:read')]
+    #[Groups(['product:read', 'product:create', 'product:update'])]
     private ?float $price = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups('product:read')]
+    #[Groups(['product:read', 'product:create', 'product:update'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 50)]
@@ -34,19 +34,19 @@ class Product
     private ?string $reference = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
-    #[Groups('product:read')]
+    #[Groups(['product:read', 'product:create', 'product:update'])]
     private ?Material $material;
 
     #[ORM\ManyToMany(targetEntity: Color::class, inversedBy: 'products')]
-    #[Groups('product:read')]
+    #[Groups(['product:read', 'product:create', 'product:update'])]
     private Collection $color;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
-    #[Groups('product:read')]
+    #[Groups(['product:read', 'product:create', 'product:update'])]
     private ?Brand $brand = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
-    #[Groups('product:read')]
+    #[Groups(['product:read', 'product:create', 'product:update'])]
     private ?Type $type = null;
 
     public function __construct()

@@ -46,6 +46,14 @@ class TypeController extends AbstractController
     }
 
     #[Route('/type/{id}', name: 'app_type_get', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne un type.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Types')]
     public function get(Type $type): JsonResponse
     {
@@ -63,6 +71,24 @@ class TypeController extends AbstractController
     }
 
     #[Route('/types', name: 'app_type_add', methods: ['POST'])]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Type::class,
+                    groups: ['type:create']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne le type.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Types')]
     public function add(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -89,6 +115,24 @@ class TypeController extends AbstractController
     }
 
     #[Route('/type/{id}', name: 'app_type_update', methods: ['PUT'])]
+    #[OA\Put(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Type::class,
+                    groups: ['type:update']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne le type.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['product:read'])),
+        )
+    )]
     #[OA\Tag(name: 'Types')]
     public function update(Type $type, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {

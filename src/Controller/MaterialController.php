@@ -45,6 +45,14 @@ class MaterialController extends AbstractController
     }
 
     #[Route('/material/{id}', name: 'app_material_get', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne une matière.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Matières')]
     public function get(Material $material): JsonResponse
     {
@@ -62,6 +70,24 @@ class MaterialController extends AbstractController
     }
 
     #[Route('/materials', name: 'app_material_add', methods: ['POST'])]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Material::class,
+                    groups: ['material:create']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne la matière.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Matières')]
     public function add(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -88,6 +114,24 @@ class MaterialController extends AbstractController
     }
 
     #[Route('/material/{id}', name: 'app_material_update', methods: ['PUT'])]
+    #[OA\Put(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Material::class,
+                    groups: ['material:update']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne la matière.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Material::class, groups: ['product:read'])),
+        )
+    )]
     #[OA\Tag(name: 'Matières')]
     public function update(Material $material, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {

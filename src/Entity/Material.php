@@ -14,11 +14,11 @@ class Material
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups('product:read')]
+    #[Groups(['product:read','product:update','product:create'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups('product:read')]
+    #[Groups(['product:read', 'material:create', 'material:update'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'material',targetEntity: Product::class)]

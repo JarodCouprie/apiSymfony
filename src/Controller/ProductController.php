@@ -8,6 +8,7 @@ use App\Repository\ColorRepository;
 use App\Repository\MaterialRepository;
 use App\Repository\ProductRepository;
 use App\Repository\TypeRepository;
+use App\Service\ProductService;
 use Doctrine\ORM\EntityManagerInterface;
 use Faker\Factory;
 use OpenApi\Attributes as OA;
@@ -51,6 +52,14 @@ class ProductController extends AbstractController
     }
 
     #[Route('/product/{id}', name: 'app_product_get', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne un produit.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Produits')]
     public function get(Product $product): JsonResponse
     {
@@ -68,61 +77,32 @@ class ProductController extends AbstractController
     }
 
     #[Route('/products', name: 'app_product_add', methods: ['POST'])]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Product::class,
+                    groups: ['product:create']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne le produit.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Produits')]
-    public function add(Request $request, EntityManagerInterface $entityManager, TypeRepository $typeRepository, BrandRepository $brandRepository, ColorRepository $colorRepository, MaterialRepository $materialRepository): JsonResponse
+    public function add(Request $request, ProductService $productService): JsonResponse
     {
         try {
-            $faker = Factory::create();
             // On récupère les données du corpps de la requête
             // Que l'on transforme ensuite en tableau assoficatif
             $data = json_decode($request->getContent(), true);
-
-            // On traite les données pour créer un nouveau Produit
-            $product = new Product();
-            $product->setName($data['name']);
-            $product->setPrice($data['price']);
-            $product->setDescription($data['description']);
-            $product->setReference($faker->unique()->ean13);
-
-            if (!empty($data['type'])) {
-                $type = $typeRepository->find($data['type']);
-
-                if (!$type) {
-                    throw new \Exception("Le type renseigné n'existe pas");
-                }
-                $product->setType($type);
-            }
-            if (!empty($data['brand'])) {
-                $brand = $brandRepository->find($data['type']);
-
-                if (!$brand) {
-                    throw new \Exception("La marque renseignée n'existe pas");
-                }
-                $product->setBrand($brand);
-            }
-            if (!empty($data['material'])) {
-                $material = $materialRepository->find($data['material']);
-
-                if (!$material) {
-                    throw new \Exception("Le matériau renseigné n'existe pas");
-                }
-                $product->setMaterial($material);
-            }
-            if (!empty($data['color'])) {
-                foreach ($data['color'] as $item) {
-                    $color = $colorRepository->find($item);
-
-                    if (!$color) {
-                        throw new \Exception("La couleur renseignée n'existe pas");
-                    }
-                    $product->addColor($color);
-                }
-            }
-
-
-            $entityManager->persist($product);
-            $entityManager->flush();
-
+            $product = $productService->create($data);
 
             return $this->json($product, context: [
                 'groups' => ['product:read']
@@ -136,58 +116,33 @@ class ProductController extends AbstractController
     }
 
     #[Route('/product/{id}', name: 'app_product_update', methods: ['PUT'])]
+    #[OA\Put(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Product::class,
+                    groups: ['product:update']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne le produit.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['product:read'])),
+        )
+    )]
     #[OA\Tag(name: 'Produits')]
-    public function update(Product $product, Request $request, EntityManagerInterface $entityManager, TypeRepository $typeRepository, BrandRepository $brandRepository, ColorRepository $colorRepository, MaterialRepository $materialRepository): JsonResponse
+    public function update(Product $product, Request $request, ProductService $productService): JsonResponse
     {
         try {
             // On récupère les données du corpps de la requête
             // Que l'on transforme ensuite en tableau assoficatif
             $data = json_decode($request->getContent(), true);
 
-            // On traite les données pour modifier le produit
-            $product->setName($data['name']);
-            $product->setPrice($data['price']);
-            $product->setDescription($data['description']);
-
-            if (!empty($data['type'])) {
-                $type = $typeRepository->find($data['type']);
-
-                if (!$type) {
-                    throw new \Exception("Le type renseigné n'existe pas");
-                }
-                $product->setType($type);
-            }
-            if (!empty($data['brand'])) {
-                $brand = $brandRepository->find($data['type']);
-
-                if (!$brand) {
-                    throw new \Exception("La marque renseignée n'existe pas");
-                }
-                $product->setBrand($brand);
-            }
-            if (!empty($data['material'])) {
-                $material = $materialRepository->find($data['material']);
-
-                if (!$material) {
-                    throw new \Exception("Le matériau renseigné n'existe pas");
-                }
-                $product->setMaterial($material);
-            }
-            if (!empty($data['color'])) {
-                $product->resetColor();
-                foreach ($data['color'] as $item) {
-                    $color = $colorRepository->find($item);
-
-                    if (!$color) {
-                        throw new \Exception("La couleur renseignée n'existe pas");
-                    }
-                    $product->addColor($color);
-                }
-            }
-
-            $entityManager->persist($product);
-            $entityManager->flush();
-
+            $productService->update($product, $data);
 
             return $this->json($product, context: [
                 'groups' => ['product:read']

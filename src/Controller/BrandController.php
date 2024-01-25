@@ -47,6 +47,14 @@ class BrandController extends AbstractController
     }
 
     #[Route('/brand/{id}', name: 'app_brand_get', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne une marque.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Marques')]
     public function get(Brand $brand): JsonResponse
     {
@@ -64,6 +72,24 @@ class BrandController extends AbstractController
     }
 
     #[Route('/brands', name: 'app_brand_add', methods: ['POST'])]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Brand::class,
+                    groups: ['brand:create']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne la marque.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Marques')]
     public function add(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -90,6 +116,24 @@ class BrandController extends AbstractController
     }
 
     #[Route('/brand/{id}', name: 'app_brand_update', methods: ['PUT'])]
+    #[OA\Put(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Brand::class,
+                    groups: ['brand:update']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne la marque.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read'])),
+        )
+    )]
     #[OA\Tag(name: 'Marques')]
     public function update(Brand $brand, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {

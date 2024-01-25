@@ -45,6 +45,14 @@ class ColorController extends AbstractController
     }
 
     #[Route('/color/{id}', name: 'app_color_get', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne une couleur.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Color::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Couleurs')]
     public function get(Color $color): JsonResponse
     {
@@ -62,6 +70,24 @@ class ColorController extends AbstractController
     }
 
     #[Route('/colors', name: 'app_color_add', methods: ['POST'])]
+    #[OA\Post(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Color::class,
+                    groups: ['color:create']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne la couleur.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Color::class, groups: ['product:read']))
+        )
+    )]
     #[OA\Tag(name: 'Couleurs')]
     public function add(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
@@ -88,6 +114,24 @@ class ColorController extends AbstractController
     }
 
     #[Route('/color/{id}', name: 'app_color_update', methods: ['PUT'])]
+    #[OA\Put(
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                ref: new Model(
+                    type: Color::class,
+                    groups: ['color:update']
+                )
+            )
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Retourne la couleur.',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: Color::class, groups: ['product:read'])),
+        )
+    )]
     #[OA\Tag(name: 'Couleurs')]
     public function update(Color $color, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
