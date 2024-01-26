@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
-use App\Entity\Color;
-use App\Repository\ColorRepository;
+use App\Entity\Brand;
+use App\Repository\BrandRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -11,28 +11,30 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 #[Route('/api')]
-class ColorController extends AbstractController
+class BrandController extends AbstractController
 {
-    #[Route('/colors', name: 'app_colors', methods: ['GET'])]
+    #[Route('/brands', name: 'app_brand', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Retourne toutes les couleurs des produits.',
+        description: 'Retourne toutes les marques.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Color::class, groups: ['product:read']))
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read']))
         )
     )]
-    #[OA\Tag(name: 'Couleurs')]
+    #[OA\Tag(name: 'Marques')]
     #[Security(name: 'Bearer')]
-    public function index(ColorRepository $colorRepository): JsonResponse
+    public function index(BrandRepository $brandRepository): Response
     {
         try {
-            $color = $colorRepository->findAll();
+            $brand = $brandRepository->findAll();
             return $this->json([
-                'colors' => $color
+                'brands' => $brand
             ], context: [
                 'groups' => ['product:read']
             ]);
@@ -44,20 +46,20 @@ class ColorController extends AbstractController
         }
     }
 
-    #[Route('/color/{id}', name: 'app_color_get', methods: ['GET'])]
+    #[Route('/brand/{id}', name: 'app_brand_get', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Retourne une couleur.',
+        description: 'Retourne une marque.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Color::class, groups: ['product:read']))
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read']))
         )
     )]
-    #[OA\Tag(name: 'Couleurs')]
-    public function get(Color $color): JsonResponse
+    #[OA\Tag(name: 'Marques')]
+    public function get(Brand $brand): JsonResponse
     {
         try {
-            return $this->json($color, context: [
+            return $this->json($brand, context: [
                 'groups' => ['product:read']
             ]);
         } catch (\Exception $e) {
@@ -69,40 +71,40 @@ class ColorController extends AbstractController
 
     }
 
-    #[Route('/colors', name: 'app_color_add', methods: ['POST'])]
+    #[Route('/brands', name: 'app_brand_add', methods: ['POST'])]
     #[OA\Post(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Color::class,
-                    groups: ['color:create']
+                    type: Brand::class,
+                    groups: ['brand:create']
                 )
             )
         )
     )]
     #[OA\Response(
         response: 200,
-        description: 'Retourne la couleur.',
+        description: 'Retourne la marque.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Color::class, groups: ['product:read']))
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read']))
         )
     )]
-    #[OA\Tag(name: 'Couleurs')]
+    #[OA\Tag(name: 'Marques')]
     public function add(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
 
-            $color = new Color();
-            $color->setName($data['name']);
+            $brand = new Brand();
+            $brand->setName($data['name']);
 
 
-            $entityManager->persist($color);
+            $entityManager->persist($brand);
             $entityManager->flush();
 
 
-            return $this->json($color, context: [
+            return $this->json($brand, context: [
                 'groups' => ['product:read']
             ]);
         } catch (\Exception $e) {
@@ -113,38 +115,38 @@ class ColorController extends AbstractController
         }
     }
 
-    #[Route('/color/{id}', name: 'app_color_update', methods: ['PUT'])]
+    #[Route('/brand/{id}', name: 'app_brand_update', methods: ['PUT'])]
     #[OA\Put(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Color::class,
-                    groups: ['color:update']
+                    type: Brand::class,
+                    groups: ['brand:update']
                 )
             )
         )
     )]
     #[OA\Response(
         response: 200,
-        description: 'Retourne la couleur.',
+        description: 'Retourne la marque.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Color::class, groups: ['product:read'])),
+            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read'])),
         )
     )]
-    #[OA\Tag(name: 'Couleurs')]
-    public function update(Color $color, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[OA\Tag(name: 'Marques')]
+    public function update(Brand $brand, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
 
-            $color->setName($data['name']);
+            $brand->setName($data['name']);
 
-            $entityManager->persist($color);
+            $entityManager->persist($brand);
             $entityManager->flush();
 
 
-            return $this->json($color, context: [
+            return $this->json($brand, context: [
                 'groups' => ['product:read']
             ]);
         } catch (\Exception $e) {
@@ -155,16 +157,16 @@ class ColorController extends AbstractController
         }
     }
 
-    #[Route('/color/{id}', name: 'app_color_delete', methods: ['DELETE'])]
-    #[OA\Tag(name: 'Couleurs')]
-    public function delete(Color $color, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/brand/{id}', name: 'app_brand_delete', methods: ['DELETE'])]
+    #[OA\Tag(name: 'Marques')]
+    public function delete(Brand $brand, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
-            $entityManager->remove($color);
+            $entityManager->remove($brand);
             $entityManager->flush();
             return $this->json([
                 'code' => 200,
-                'message' => 'La couleur a été supprimée avec succès'
+                'message' => 'La marque a été supprimée avec succès'
             ]);
         } catch (\Exception $e) {
             return $this->json([
@@ -174,4 +176,5 @@ class ColorController extends AbstractController
         }
 
     }
+
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
-use App\Entity\Brand;
-use App\Repository\BrandRepository;
+use App\Entity\Product;
+use App\Service\ProductService;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -11,30 +11,29 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 
 #[Route('/api')]
-class BrandController extends AbstractController
+class ProductController extends AbstractController
 {
-    #[Route('/brands', name: 'app_brand', methods: ['GET'])]
+    #[Route('/products', name: 'app_products', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Retourne toutes les marques.',
+        description: 'Retourne tous les produits.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read']))
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['product:read']))
         )
     )]
-    #[OA\Tag(name: 'Marques')]
+    #[OA\Tag(name: 'Produits')]
     #[Security(name: 'Bearer')]
-    public function index(BrandRepository $brandRepository): Response
+    public function index(ProductService $productService): JsonResponse
     {
         try {
-            $brand = $brandRepository->findAll();
+            $products = $productService->getAllProducts();
             return $this->json([
-                'brands' => $brand
+                'products' => $products
             ], context: [
                 'groups' => ['product:read']
             ]);
@@ -46,20 +45,20 @@ class BrandController extends AbstractController
         }
     }
 
-    #[Route('/brand/{id}', name: 'app_brand_get', methods: ['GET'])]
+    #[Route('/product/{id}', name: 'app_product_get', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Retourne une marque.',
+        description: 'Retourne un produit.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read']))
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['product:read']))
         )
     )]
-    #[OA\Tag(name: 'Marques')]
-    public function get(Brand $brand): JsonResponse
+    #[OA\Tag(name: 'Produits')]
+    public function get(Product $product): JsonResponse
     {
         try {
-            return $this->json($brand, context: [
+            return $this->json($product, context: [
                 'groups' => ['product:read']
             ]);
         } catch (\Exception $e) {
@@ -71,40 +70,35 @@ class BrandController extends AbstractController
 
     }
 
-    #[Route('/brands', name: 'app_brand_add', methods: ['POST'])]
+    #[Route('/products', name: 'app_product_add', methods: ['POST'])]
     #[OA\Post(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Brand::class,
-                    groups: ['brand:create']
+                    type: Product::class,
+                    groups: ['product:create']
                 )
             )
         )
     )]
     #[OA\Response(
         response: 200,
-        description: 'Retourne la marque.',
+        description: 'Retourne le produit.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read']))
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['product:read']))
         )
     )]
-    #[OA\Tag(name: 'Marques')]
-    public function add(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[OA\Tag(name: 'Produits')]
+    public function add(Request $request, ProductService $productService): JsonResponse
     {
         try {
+            // On récupère les données du corpps de la requête
+            // Que l'on transforme ensuite en tableau assoficatif
             $data = json_decode($request->getContent(), true);
+            $product = $productService->create($data);
 
-            $brand = new Brand();
-            $brand->setName($data['name']);
-
-
-            $entityManager->persist($brand);
-            $entityManager->flush();
-
-
-            return $this->json($brand, context: [
+            return $this->json($product, context: [
                 'groups' => ['product:read']
             ]);
         } catch (\Exception $e) {
@@ -115,38 +109,36 @@ class BrandController extends AbstractController
         }
     }
 
-    #[Route('/brand/{id}', name: 'app_brand_update', methods: ['PUT'])]
+    #[Route('/product/{id}', name: 'app_product_update', methods: ['PUT'])]
     #[OA\Put(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Brand::class,
-                    groups: ['brand:update']
+                    type: Product::class,
+                    groups: ['product:update']
                 )
             )
         )
     )]
     #[OA\Response(
         response: 200,
-        description: 'Retourne la marque.',
+        description: 'Retourne le produit.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Brand::class, groups: ['product:read'])),
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['product:read'])),
         )
     )]
-    #[OA\Tag(name: 'Marques')]
-    public function update(Brand $brand, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[OA\Tag(name: 'Produits')]
+    public function update(Product $product, Request $request, ProductService $productService): JsonResponse
     {
         try {
+            // On récupère les données du corpps de la requête
+            // Que l'on transforme ensuite en tableau assoficatif
             $data = json_decode($request->getContent(), true);
 
-            $brand->setName($data['name']);
+            $productService->update($product, $data);
 
-            $entityManager->persist($brand);
-            $entityManager->flush();
-
-
-            return $this->json($brand, context: [
+            return $this->json($product, context: [
                 'groups' => ['product:read']
             ]);
         } catch (\Exception $e) {
@@ -157,16 +149,16 @@ class BrandController extends AbstractController
         }
     }
 
-    #[Route('/brand/{id}', name: 'app_brand_delete', methods: ['DELETE'])]
-    #[OA\Tag(name: 'Marques')]
-    public function delete(Brand $brand, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/product/{id}', name: 'app_product_delete', methods: ['DELETE'])]
+    #[OA\Tag(name: 'Produits')]
+    public function delete(Product $product, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
-            $entityManager->remove($brand);
+            $entityManager->remove($product);
             $entityManager->flush();
             return $this->json([
                 'code' => 200,
-                'message' => 'La marque a été supprimée avec succès'
+                'message' => 'Le produit a été supprimé avec succès'
             ]);
         } catch (\Exception $e) {
             return $this->json([
@@ -176,5 +168,4 @@ class BrandController extends AbstractController
         }
 
     }
-
 }

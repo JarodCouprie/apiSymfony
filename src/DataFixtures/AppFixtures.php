@@ -4,6 +4,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Product;
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -14,7 +15,7 @@ use App\Entity\Brand;
 
 class AppFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function createDB(ObjectManager $manager): void
     {
         $faker = Factory::create();
 
@@ -75,5 +76,36 @@ class AppFixtures extends Fixture
         }
 
         $manager->flush();
+    }
+
+    public function createAdmin(ObjectManager $manager)
+    {
+        $user = new User();
+
+        $user->setEmail('admin@apiproduct.fr');
+        $user->setPassword(password_hash('azerty', PASSWORD_DEFAULT));
+        $user->setRoles(array('ROLE_ADMIN'));
+
+        $manager->persist($user);
+        $manager->flush();
+    }
+
+    public function createUser(ObjectManager $manager)
+    {
+        $user = new User();
+
+        $user->setEmail('user@apiproduct.fr');
+        $user->setPassword(password_hash('azerty', PASSWORD_DEFAULT));
+        $user->setRoles(array('ROLE_USER'));
+
+        $manager->persist($user);
+        $manager->flush();
+    }
+
+    public function load(ObjectManager $manager): void
+    {
+        $this->createDB($manager);
+        $this->createAdmin($manager);
+        $this->createUser($manager);
     }
 }

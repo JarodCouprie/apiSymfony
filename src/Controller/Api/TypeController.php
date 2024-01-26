@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Api;
 
-use App\Entity\Material;
-use App\Repository\MaterialRepository;
+use App\Entity\Type;
+use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -13,26 +13,27 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 #[Route('/api')]
-class MaterialController extends AbstractController
+class TypeController extends AbstractController
 {
-    #[Route('/materials', name: 'app_materials', methods: ['GET'])]
+    #[Route('/types', name: 'app_types', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Retourne toutes les matières des produits.',
+        description: 'Retourne tous les types des produits.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Material::class, groups: ['product:read']))
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['product:read']))
         )
     )]
-    #[OA\Tag(name: 'Matières')]
+    #[OA\Tag(name: 'Types')]
     #[Security(name: 'Bearer')]
-    public function index(MaterialRepository $materialRepository): JsonResponse
+    public function index(TypeRepository $typeRepository): JsonResponse
     {
         try {
-            $material = $materialRepository->findAll();
+            $type = $typeRepository->findAll();
             return $this->json([
-                'materials' => $material
+                'types' => $type
             ], context: [
                 'groups' => ['product:read']
             ]);
@@ -44,20 +45,20 @@ class MaterialController extends AbstractController
         }
     }
 
-    #[Route('/material/{id}', name: 'app_material_get', methods: ['GET'])]
+    #[Route('/type/{id}', name: 'app_type_get', methods: ['GET'])]
     #[OA\Response(
         response: 200,
-        description: 'Retourne une matière.',
+        description: 'Retourne un type.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Material::class, groups: ['product:read']))
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['product:read']))
         )
     )]
-    #[OA\Tag(name: 'Matières')]
-    public function get(Material $material): JsonResponse
+    #[OA\Tag(name: 'Types')]
+    public function get(Type $type): JsonResponse
     {
         try {
-            return $this->json($material, context: [
+            return $this->json($type, context: [
                 'groups' => ['product:read']
             ]);
         } catch (\Exception $e) {
@@ -69,40 +70,40 @@ class MaterialController extends AbstractController
 
     }
 
-    #[Route('/materials', name: 'app_material_add', methods: ['POST'])]
+    #[Route('/types', name: 'app_type_add', methods: ['POST'])]
     #[OA\Post(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Material::class,
-                    groups: ['material:create']
+                    type: Type::class,
+                    groups: ['type:create']
                 )
             )
         )
     )]
     #[OA\Response(
         response: 200,
-        description: 'Retourne la matière.',
+        description: 'Retourne le type.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Material::class, groups: ['product:read']))
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['product:read']))
         )
     )]
-    #[OA\Tag(name: 'Matières')]
+    #[OA\Tag(name: 'Types')]
     public function add(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
 
-            $material = new Material();
-            $material->setName($data['name']);
+            $type = new Type();
+            $type->setName($data['name']);
 
 
-            $entityManager->persist($material);
+            $entityManager->persist($type);
             $entityManager->flush();
 
 
-            return $this->json($material, context: [
+            return $this->json($type, context: [
                 'groups' => ['product:read']
             ]);
         } catch (\Exception $e) {
@@ -113,38 +114,38 @@ class MaterialController extends AbstractController
         }
     }
 
-    #[Route('/material/{id}', name: 'app_material_update', methods: ['PUT'])]
+    #[Route('/type/{id}', name: 'app_type_update', methods: ['PUT'])]
     #[OA\Put(
         requestBody: new OA\RequestBody(
             content: new OA\JsonContent(
                 ref: new Model(
-                    type: Material::class,
-                    groups: ['material:update']
+                    type: Type::class,
+                    groups: ['type:update']
                 )
             )
         )
     )]
     #[OA\Response(
         response: 200,
-        description: 'Retourne la matière.',
+        description: 'Retourne le type.',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Material::class, groups: ['product:read'])),
+            items: new OA\Items(ref: new Model(type: Type::class, groups: ['product:read'])),
         )
     )]
-    #[OA\Tag(name: 'Matières')]
-    public function update(Material $material, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[OA\Tag(name: 'Types')]
+    public function update(Type $type, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
 
-            $material->setName($data['name']);
+            $type->setName($data['name']);
 
-            $entityManager->persist($material);
+            $entityManager->persist($type);
             $entityManager->flush();
 
 
-            return $this->json($material, context: [
+            return $this->json($type, context: [
                 'groups' => ['product:read']
             ]);
         } catch (\Exception $e) {
@@ -155,16 +156,16 @@ class MaterialController extends AbstractController
         }
     }
 
-    #[Route('/material/{id}', name: 'app_material_delete', methods: ['DELETE'])]
-    #[OA\Tag(name: 'Matières')]
-    public function delete(Material $material, EntityManagerInterface $entityManager): JsonResponse
+    #[Route('/type/{id}', name: 'app_type_delete', methods: ['DELETE'])]
+    #[OA\Tag(name: 'Types')]
+    public function delete(Type $type, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
-            $entityManager->remove($material);
+            $entityManager->remove($type);
             $entityManager->flush();
             return $this->json([
                 'code' => 200,
-                'message' => 'La matière a été supprimée avec succès'
+                'message' => 'Le type a été supprimé avec succès'
             ]);
         } catch (\Exception $e) {
             return $this->json([

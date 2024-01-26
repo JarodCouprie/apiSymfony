@@ -35,7 +35,7 @@ class Product
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[Groups(['product:read', 'product:create', 'product:update'])]
-    private ?Material $material;
+    private ?Material $material = null;
 
     #[ORM\ManyToMany(targetEntity: Color::class, inversedBy: 'products')]
     #[Groups(['product:read', 'product:create', 'product:update'])]
