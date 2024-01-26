@@ -22,11 +22,11 @@ class Type
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'type', targetEntity: Product::class)]
-    private Collection $product;
+    private Collection $products;
 
     public function __construct()
     {
-        $this->product = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -46,14 +46,32 @@ class Type
         return $this;
     }
 
-    public function getProduct(): ArrayCollection|Collection
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
     {
-        return $this->product;
+        return $this->products;
     }
 
-    public function setProduct(?Product $product): static
+    public function addProduct(Product $product): static
     {
-        $this->product = $product;
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setType($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getType() === $this) {
+                $product->setType(null);
+            }
+        }
 
         return $this;
     }

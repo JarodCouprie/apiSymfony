@@ -3,13 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Color;
-use App\Entity\Product;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ColorType extends AbstractType
+class ProductColorType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

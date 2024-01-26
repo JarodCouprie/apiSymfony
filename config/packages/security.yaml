@@ -42,6 +42,7 @@ security:
       custom_authenticator: App\Security\LoginAuthenticator
       logout:
         path: app_admin_logout
+        target: app_admin_login
         # where to redirect after logout
         # target: app_any_route
       remember_me:
@@ -66,6 +67,7 @@ security:
     - { path: ^/api/doc, roles: PUBLIC_ACCESS }
     - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
     - { path: ^/admin/login,       roles: PUBLIC_ACCESS }
+    - { path: ^/admin/logout,       roles: PUBLIC_ACCESS }
     - { path: ^/admin,       roles: ROLE_ADMIN }
 
 when@test:

@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Color;
-use App\Form\ColorType;
+use App\Form\ProductColorType;
 use App\Repository\ColorRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +26,7 @@ class ColorController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $color = new Color();
-        $form = $this->createForm(ColorType::class, $color);
+        $form = $this->createForm(ProductColorType::class, $color);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -53,7 +53,7 @@ class ColorController extends AbstractController
     #[Route('/{id}/edit', name: 'app_admin_color_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Color $color, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(ColorType::class, $color);
+        $form = $this->createForm(ProductColorType::class, $color);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

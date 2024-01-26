@@ -14,19 +14,19 @@ class Material
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['product:read','product:update','product:create'])]
+    #[Groups(['product:read', 'product:update', 'product:create'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]
     #[Groups(['product:read', 'material:create', 'material:update'])]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'material',targetEntity: Product::class)]
-    private Collection $product;
+    #[ORM\OneToMany(mappedBy: 'material', targetEntity: Product::class)]
+    private Collection $products;
 
     public function __construct()
     {
-        $this->product = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -46,14 +46,32 @@ class Material
         return $this;
     }
 
-    public function getProduct(): ArrayCollection|Collection
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
     {
-        return $this->product;
+        return $this->products;
     }
 
-    public function setProduct(?Product $product): static
+    public function addProduct(Product $product): static
     {
-        $this->product = $product;
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setMaterial($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getMaterial() === $this) {
+                $product->setMaterial(null);
+            }
+        }
 
         return $this;
     }

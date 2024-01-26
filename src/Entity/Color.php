@@ -14,7 +14,7 @@ class Color
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['product:read','product:update','product:create'])]
+    #[Groups(['product:read', 'product:update', 'product:create'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]

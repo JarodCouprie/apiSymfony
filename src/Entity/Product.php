@@ -107,7 +107,7 @@ class Product
         return $this;
     }
 
-    public function getMaterial(): Material
+    public function getMaterial(): ?Material
     {
         return $this->material;
     }
